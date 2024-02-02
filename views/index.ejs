@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+      
+        <p class="header">Register to see more</p>
+
+        <form action="/register" method="post" >
+        <input type="email" name="email" placeholder="Email" class="detail" /><br />
+        <input type="username" name="username" placeholder="Username" class="detail" /><br />
+        <input type="fullname" name="fullname" placeholder="Full Name" class="detail" /><br />
+        <input type="password" name="password" placeholder="Password" class="detail" />
+        <input type="submit" class="btn int" value="Register Account">
+      </form>
+
+        <a href="/forgot">Forgot your password?</a>
+
+      <br>
+      
+        <footer>
+          <p>
+            By continuing, you agree to My
+            <b>Terms of Service, Privacy policy.</b>
+          </p>
+          <hr />
+          <a href="/login">Already Registered? Log In Here ..</a>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

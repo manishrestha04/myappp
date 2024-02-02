@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' href='/stylesheets/login.css' />
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <p class="header">LogIn to see more</p>
+
+        <% if(error.length > 0) { %>
+          <p class="error"><%= error %></p>
+          <% } %>
+
+        <form action="/login" method="post" >
+        <input type="username" name="username" placeholder="Username" class="detail" /><br />
+        <input type="password" name="password" placeholder="Password" class="detail" />
+        <input type="submit" class="btn int" value="Log In">
+      </form>
+
+        <a href="/forgot">Forgot your password?</a>
+        <footer>
+          <p>
+            By continuing, you agree to My
+            <b>Terms of Service, Privacy policy.</b>
+          </p>
+          <hr />
+          <a href="/">Not Registered Yet? Sign Up.</a>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
