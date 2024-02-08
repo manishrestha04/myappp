@@ -19,6 +19,7 @@ router.get('/login', function(req, res, next) {
 });
 
 
+//Upload Post from user
 router.post('/upload', isLoggedIn, upload.single("file"), async function(req, res, next){
   if(!req.file) {
     return res.status(404).send("no files were give");
@@ -36,6 +37,7 @@ router.post('/upload', isLoggedIn, upload.single("file"), async function(req, re
 })
 
 
+//Upload Profile Picture
 router.post('/uploadpp', isLoggedIn, upload.single("image"), async function(req, res, next){
   if(!req.file) {
     return res.status(404).send("no files were give");
@@ -47,26 +49,65 @@ router.post('/uploadpp', isLoggedIn, upload.single("image"), async function(req,
 })
 
 
+//Delete Post
 router.get('/delete/:postId', isLoggedIn, async function(req, res, next) {
+
+  const postId = req.params.postId;
+
   try {
-    const postId = req.params.post._id;
+
+      await postModel.deleteOne({ _id: postId, user:req.user._id})
+
+      req.flash('success', 'Post deleted successfully');
+
+      res.redirect("/profile");
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      return res.status(400).send('Invalid post ID');
+//Edit Post
+router.get("/editpost/:postId", isLoggedIn, async function(req,res){
+  const postId = req.params.postId;
+
+  try {
+
+    const post = await postModel.findOne({_id: postId, user: req.user._id})
+
+    if (!post) {
+      // Post not found, you might want to handle this case
+      return res.status(404).send("Post not found");
     }
 
-    const user = await userModel.findOne({ username: req.session.passport.user });
-    const post = await postModel.findById(postId);
+    res.render('editpost', {post});
+  } catch(error) {
+    console.error(error);
+    res.sendStatus(500).send("Internal Server Error");
+  }
+});
 
-    if (!post || !post.user.equals(req.user._id)) {
-      return res.status(404).send("Post not found or you don't have permission to delete it");
+
+//Update Post
+router.post('/updatepost/:postId', isLoggedIn, async function(req, res, next) {
+  const postId = req.params.postId;
+  const updatedContent = req.body.imageText;
+
+  try {
+    
+    const post = await postModel.findOne({ _id: postId, user: req.user._id });
+
+    if (!post) {
+      return res.status(404).send("Post not found");
     }
 
-    user.posts.pull(postId);
-    await user.save();
+    post.imageText = updatedContent;
+    await post.save();
 
-    await post.remove();
+
+    req.flash('success', 'Your Post has been updated sucessfully');
 
     res.redirect("/profile");
   } catch (error) {
@@ -76,15 +117,20 @@ router.get('/delete/:postId', isLoggedIn, async function(req, res, next) {
 });
 
 
-
+//Display profile data
 router.get('/profile', isLoggedIn, async function(req, res, next) {
+  const successMessage = req.flash('success');
+  const errorMessage = req.flash('error');
+  
   const user = await userModel.findOne({
     username: req.session.passport.user
   })
   .populate("posts");
-  res.render("profile", {user});
+  res.render("profile",{ success: successMessage, error: errorMessage, user});
 });
 
+
+//Register 
 router.post('/register',function(req, res){
   const { username, email, fullname} = req.body;
   const userData = new userModel ({username, email, fullname});
@@ -96,6 +142,7 @@ router.post('/register',function(req, res){
     })
   })
 })
+
 
 router.post('/login', passport.authenticate("local", {
   successRedirect: "/profile",
